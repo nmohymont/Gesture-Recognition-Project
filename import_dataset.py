@@ -45,7 +45,7 @@ print(f"Dimension du dataset : {dataset.shape}")
 print(dataset.head())
 
 # ligne a décommenter pour sauvegarder le dataset traité dans un fichier csv
-dataset.to_csv(os.path.join(BASE_DIR, "Dataset", "Domain1_aggregated_csv", "Domain1_processed_dataset.csv"), index=False)
+dataset.to_csv(os.path.join(BASE_DIR, "Dataset", "Aggregated_csv", "Domain1_processed_dataset.csv"), index=False)
 
 #-------------------------------------------
 #solution pour charger les data du csv en évitant l'import d'une ligne 0 <x> <y> <z> <t> skiprows=[0]

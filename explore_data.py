@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR_AGGREGATED = os.path.join(BASE_DIR, "Dataset", "Domain1_aggregated_csv")
+DATA_DIR_AGGREGATED = os.path.join(BASE_DIR, "Dataset", "Aggregated_csv")
 
 if not os.path.exists(DATA_DIR_AGGREGATED):
     os.makedirs(DATA_DIR_AGGREGATED)
@@ -23,7 +23,7 @@ def downsample_data(group,factor=2):
     #print(group.head())
 
     N= len(group)
-    if N<66:
+    if N<66: #datapoints min = 32 donc on downsample à partir de 66 points (32*2) pour éviter de perdre trop d'information
         group["downsampled"] = False
         return group
 
