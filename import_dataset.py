@@ -7,7 +7,7 @@ DATA_DIR = os.path.join(BASE_DIR, "Dataset", "Domain1_csv")
 #print(len(os.listdir(DATA_DIR))) validation que tous les chiffiers ont été chargés
 
 def load_dataset(data_dir):
-    all_data = []
+    all_data = [] #liste qui contiendra chaque dataframe de chaque fichier csv lu et nettoyé
 
     #print(os.listdir(DATA_DIR)) print tout les fichier du dossier Dataset/Domain1_csv 
     #pour vérifier que les fichiers sont bien là
@@ -16,21 +16,21 @@ def load_dataset(data_dir):
         if not file.endswith(".csv"):
             continue
         
-        name = file.replace(".csv", "").replace("Subject", "")
-        parts = name.split("-")
+        name = file.replace(".csv", "").replace("Subject", "") #enlève l'extension .csv et le préfixe "Subject" pour ne garder que les chiffres
+        parts = name.split("-") #sépare les chiffres en trois parties : subject_id, digit, repetition. Exemple : "Subject1-0-1.csv" devient ["1", "0", "1"]
 
         if len(parts) != 3:
             print(f"Filename {file} does not match expected format. Skipping.")
             continue
     
-        subject_id = int(parts[0])
-        digit= int(parts[1])
-        repetition = int(parts[2])
+        subject_id = int(parts[0]) #le premier chiffre correspond à l'identifiant du sujet
+        digit= int(parts[1]) #le deuxième chiffre correspond au chiffre que le sujet doit signer (de 0 à 9)
+        repetition = int(parts[2]) #le troisième chiffre correspond à la répétition de la même séquence de signes (de 1 à 3)
 
-        filepath = os.path.join(DATA_DIR, file)
-        df = pd.read_csv(filepath, skiprows=[0], names=['x','y','z','t'])
+        filepath = os.path.join(DATA_DIR, file) 
+        df = pd.read_csv(filepath, skiprows=[0], names=['x','y','z','t']) 
     
-        df['subject_id'] = subject_id
+        df['subject_id'] = subject_id 
         df['digit'] = digit
         df['repetition'] = repetition
 
