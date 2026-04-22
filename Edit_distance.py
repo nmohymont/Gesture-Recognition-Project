@@ -25,8 +25,8 @@ def edit_distance(w1,w2):
                 delete = df[i-1][j] +1 #del
                 replace = df[i-1][j-1] +1 #sub
                 df[i][j] = min(add,delete,replace)
-    print(df)
-    (print(f"Edit-distance entre",w1, "et", w2, " est de ", df[m][n]))
+    #print(df)
+    #(print(f"Edit-distance entre",w1, "et", w2, " est de ", df[m][n]))
     return df[m][n]
 
 cost = edit_distance('arbre','arbitrage')
