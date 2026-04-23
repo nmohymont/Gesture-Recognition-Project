@@ -23,8 +23,8 @@ def downsample_data(group,factor=2):
     #print(group.head())
 
     N= len(group)
+
     if N<66: #datapoints min = 32 donc on downsample à partir de 66 points (32*2) pour éviter de perdre trop d'information
-        group["downsampled"] = False
         return group
 
     t_first = int(group['t'].iloc[0])
@@ -45,17 +45,14 @@ def downsample_data(group,factor=2):
     chosen_idx= set()
 
     for t_target in target_times:
-        idx = np.argmin(np.abs(t_values - t_target))
+        idx = np.argmin(np.abs(t_values - t_target)) # trouve l'instant théorique idéel le plus proche de ligne réeel
         chosen_idx.add(idx)
 
     result = group.iloc[sorted(chosen_idx)].reset_index(drop=True)
 
     if not (32<= len(result) <= 120):
-        group["downsampled"] = False
         return group
     
-    result["downsampled"] = True
-
     return result 
 
 print("Sous-echantillonnage des données...")
