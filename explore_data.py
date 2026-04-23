@@ -213,4 +213,58 @@ def plot_xy_grid(subject=Subject, line_color=Line_color):
     print("Affichage terminé.")
 
 
-plot_xy_grid(subject=10)
+#plot_xy_grid(subject=10)
+
+# plot 3D of 1 subject and 1 digit before and after downsampling the repetition with the least points (most representative of the downsampling)
+
+def plot_3d(df_subject=Subject, digit=0, line_color=Line_color):
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Sélection du groupe original
+    df_group = df[
+        (df['subject_id'] == subject) &
+        (df['digit'] == digit)
+    ]
+
+    rep_counts = df_group.groupby("repetition").size()
+    best_rep = rep_counts.idxmin() # répétition avec le moins de points (plus représentative du sous-échantillonnage)
+
+    # données originales pour la répétition choisie
+    df_orig= df_group[df_group['repetition'] == best_rep].sort_values('t')
+
+    # données sous-échantillonnées pour le même groupe
+    df_downsampled = df_result[
+        (df_result['subject_id'] == subject) &
+        (df_result['digit'] == digit) &
+        (df_result['repetition'] == best_rep)
+    ].sort_values('t')
+
+    for col in ["x", "y", "z"]:
+        df_orig[col] = df_orig[col].astype(float)
+        df_downsampled[col] = df_downsampled[col].astype(float)
+
+    ax.plot(df_orig["x"].values, df_orig["y"].values, df_orig["t"].values,
+             color=line_color, linewidth=0.9, alpha=0.85, label="Original")
+    ax.scatter(df_orig["x"].values, df_orig["y"].values, df_orig["t"].values,
+                color=line_color, s=6, zorder=3)
+
+    ax.plot(df_downsampled["x"].values, df_downsampled["y"].values, df_downsampled["t"].values,
+              color='red', linewidth=0.9, alpha=0.85, label="Downsampled")
+    ax.scatter(df_downsampled["x"].values, df_downsampled["y"].values, df_downsampled["t"].values,
+                 color='red', s=6, zorder=3)
+
+    ax.set_title(
+        f"3D Gesture - Subject {subject} — Digit {digit} — Rep {best_rep}\n Comparaison n_original {df_orig.shape[0]} vs n_downsampled {df_downsampled.shape[0]}",
+        fontsize=10, fontweight="bold"
+    )
+    ax.set_xlabel("x", fontsize=8)
+    ax.set_ylabel("y", fontsize=8)
+    ax.set_zlabel("t", fontsize=8)
+    ax.tick_params(labelsize=6)
+    ax.grid(True, linewidth=0.3, alpha=0.4)
+    ax.legend()
+    plt.show()
+    print("Affichage 3D terminé.")
+
+plot_3d(subject=10, digit=0)
