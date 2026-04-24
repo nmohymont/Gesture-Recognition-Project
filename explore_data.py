@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR_AGGREGATED = os.path.join(BASE_DIR, "Dataset", "Aggregated_csv")
 
@@ -110,7 +112,12 @@ N_columns = 2
 
 
 
-def plot_xy_grid(subject=Subject, line_color=Line_color):
+def plot_xy_grid(df, df_downsampled, subject=1, line_color='black'):
+
+    Digits = sorted(df['digit'].unique())
+    N_rows = len(Digits)
+    N_columns = 2
+
     fig, axes = plt.subplots(N_rows, N_columns, figsize=(18, 7))
     
     for row_idx, digit in enumerate(Digits):
@@ -129,14 +136,13 @@ def plot_xy_grid(subject=Subject, line_color=Line_color):
         n_orig= len(df_orig)
 
         # données sous-échantillonnées pour le même groupe
-        df_downsampled = df_result[
-            (df_result['subject_id'] == subject) &
-            (df_result['digit'] == digit) &
-            (df_result['repetition'] == best_rep)
+        df_downsampled = df_downsampled[
+            (df_downsampled['subject_id'] == subject) &
+            (df_downsampled['digit'] == digit) &
+            (df_downsampled['repetition'] == best_rep)
         ].sort_values('t')
         n_downsampled = len(df_downsampled)
 
-        was_ds = df_downsampled['downsampled'].iloc[0] if len(df_downsampled)>0 else False
 
         for col in ["x", "y"]:
             df_orig[col] = df_orig[col].astype(float)
@@ -174,9 +180,9 @@ def plot_xy_grid(subject=Subject, line_color=Line_color):
         ax_right.scatter(df_downsampled["x"].values, df_downsampled["y"].values,
                      color=line_color, s=6, zorder=3)
 
-        label_ds = "downsampled" if was_ds else "original (out of rules)"
+        
         ax_right.set_title(
-            f"Digit {digit} — {label_ds}   [n = {n_downsampled}]",
+            f"Digit {digit} —    [n = {n_downsampled}]",
             fontsize=9, fontweight="bold", loc="left"
         )
         ax_right.set_xlabel("x", fontsize=7)
@@ -216,7 +222,7 @@ def plot_xy_grid(subject=Subject, line_color=Line_color):
 
 # plot 3D of 1 subject and 1 digit before and after downsampling the repetition with the least points (most representative of the downsampling)
 
-def plot_3d(df_subject=Subject, digit=0, line_color=Line_color):
+def plot_3d(df, df_downsampled, subject=1, digit=0, line_color='black'):
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection='3d')
 
@@ -233,10 +239,10 @@ def plot_3d(df_subject=Subject, digit=0, line_color=Line_color):
     df_orig= df_group[df_group['repetition'] == best_rep].sort_values('t')
 
     # données sous-échantillonnées pour le même groupe
-    df_downsampled = df_result[
-        (df_result['subject_id'] == subject) &
-        (df_result['digit'] == digit) &
-        (df_result['repetition'] == best_rep)
+    df_downsampled = df_downsampled[
+        (df_downsampled['subject_id'] == subject) &
+        (df_downsampled['digit'] == digit) &
+        (df_downsampled['repetition'] == best_rep)
     ].sort_values('t')
 
     for col in ["x", "y", "z"]:
@@ -268,7 +274,9 @@ def plot_3d(df_subject=Subject, digit=0, line_color=Line_color):
 
 #plot_3d(subject=10, digit=0)
 
+# ------------------------------
 #Domain4 
+# ----------------------------
 
 def txt_to_df(input_path):
     # 1. Extraction de la répétition (dernier chiffre du nom de fichier)
