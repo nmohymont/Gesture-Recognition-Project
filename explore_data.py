@@ -57,15 +57,13 @@ def downsample_data(group,factor=2):
 
 print("Sous-echantillonnage des données...")
 
-df_result = (
-    df.groupby(['subject_id', 'digit', 'repetition'])
+df_downsampled = (
+    df.groupby(['subject_id', 'digit', 'repetition']) 
     .apply(downsample_data)
     .reset_index(drop=True)
 )
 
-df_downsampled = df_result[df_result['downsampled'] == True].drop(columns=['downsampled'])
-
-original_count = len(df)
+original_count = len(df) 
 downsampled_count = len(df_downsampled)
 reduction = (1-downsampled_count/original_count)*100
 
@@ -74,18 +72,22 @@ print(f"Points originaux     : {original_count:,}")
 print(f"Points sous-échant.  : {downsampled_count:,}")
 print(f"Réduction effective  : {reduction:.1f}%")
 
-# --- Vérification par groupe ---
-summary = df.groupby(["subject_id", "digit", "repetition"]).size().reset_index(name="n_original")
-summary_new = df_downsampled.groupby(["subject_id", "digit", "repetition"]).size().reset_index(name="n_downsampled")
+# 2. Calcul des gestes (combinaisons uniques sujet/digit/rep)
+def count_gestures(df):
+    return len(df.groupby(['subject_id', 'digit', 'repetition']))
 
-summary["was_downsampled"] = df_result.groupby(["subject_id", "digit", "repetition"])["downsampled"].first().values
+old_gestures = count_gestures(df)
+new_gestures = count_gestures(df_downsampled)
 
-summary = summary.merge(summary_new, on=["subject_id", "digit", "repetition"])
-summary["ratio"] = summary["n_downsampled"] / summary["n_original"]
+print(f"=== BILAN DU PRÉ-TRAITEMENT ===")
+print(f"Points (coordonnées) : {original_count:,} -> {downsampled_count:,} ({reduction:.1f}% de réduction)")
+print(f"Gestes (séquences)   : {old_gestures} -> {new_gestures} (Conservation: {(new_gestures/old_gestures)*100:.1f}%)")
 
-skipped = (~summary["was_downsampled"]).sum()
-print("\n Aperçu des ratios de réduction par groupe :")
-print(summary.describe())
+if old_gestures == new_gestures:
+    print("✓ Succès : Tous les gestes ont été conservés.")
+else:
+    print(f"⚠ Attention : {old_gestures - new_gestures} geste(s) perdu(s).")
+
 
 # ligne a décommenter pour sauvegarder le dataset traité dans un fichier csv
 #df_downsampled.to_csv(os.path.join(BASE_DIR, "Dataset", "Domain1_aggregated_csv", "Domain1_downsampled_dataset.csv"), index=False)
@@ -264,4 +266,65 @@ def plot_3d(df_subject=Subject, digit=0, line_color=Line_color):
     plt.show()
     print("Affichage 3D terminé.")
 
-plot_3d(subject=10, digit=0)
+#plot_3d(subject=10, digit=0)
+
+#Domain4 
+
+def txt_to_df(input_path):
+    # 1. Extraction de la répétition (dernier chiffre du nom de fichier)
+    repetition = int(os.path.basename(input_path).split('.')[0][-1])
+
+    # 2. Lecture des métadonnées (IDs) dans l'en-tête 
+    with open(input_path, 'r') as f:
+        head = [next(f) for _ in range(6)]
+    
+    # "Class id = X" est à la ligne 2 (index 1) 
+    class_id = int(head[1].split('=')[-1].strip()) 
+    # "User id = X" est à la ligne 3 (index 2) 
+    user_id = int(head[2].split('=')[-1].strip()) 
+
+    # 3. Chargement des données (x, y, z, t)
+    # On saute les 5 premières lignes et on ignore l'accolade finale 
+    df = pd.read_csv(input_path, skiprows=5, skipfooter=1, engine='python')
+    
+    # Nettoyage des colonnes : <x>,<y>,<z>,<t> -> x, y, z, t 
+    df.columns = [c.replace('<', '').replace('>', '') for c in df.columns]
+
+    # 4. AJOUT DES COLONNES DE RÉFÉRENCE
+    # On propage les IDs sur toutes les lignes de ce geste
+    df['subject_id'] = user_id
+    df['class_id'] = class_id
+    df['repetition'] = repetition
+
+    return df
+
+
+#DATA_DIR_DOMAIN4_TEST = os.path.join(BASE_DIR, "Dataset", "Domain4_csv","3001.txt")
+#df = txt_to_df(DATA_DIR_DOMAIN4_TEST)
+
+#print(df.head())
+
+DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Dataset", "Domain4_csv")
+
+# Liste pour stocker tous les DataFrames
+liste_dfs = []
+
+
+for file in os.listdir(DATA_DIR_DOMAIN4):
+    if file.endswith(".txt") and "(1)" not in file:
+        path = os.path.join(DATA_DIR_DOMAIN4, file)
+        try:
+            # On transforme et on ajoute à la liste
+            df_geste = txt_to_df(path)
+            liste_dfs.append(df_geste)
+        except Exception as e:
+            print(f"Erreur sur {file}: {e}")
+
+# FUSION FINALE : Un seul DataFrame pour les 1000 fichiers
+if liste_dfs:
+    df_final = pd.concat(liste_dfs, ignore_index=True)
+    print(f"Extraction terminée ! Taille totale : {df_final.shape}")
+else:
+    print("Aucun fichier trouvé.")
+
+        
