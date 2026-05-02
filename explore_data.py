@@ -51,9 +51,6 @@ def downsample_data(group,factor=2):
         chosen_idx.add(idx)
 
     result = group.iloc[sorted(chosen_idx)].reset_index(drop=True)
-
-    if not (32<= len(result) <= 120):
-        return group
     
     return result 
 
