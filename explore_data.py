@@ -137,7 +137,7 @@ def plot_xy_grid(df, df_downsampled, subject=1, line_color='black'):
             (df_downsampled['subject_id'] == subject) &
             (df_downsampled['digit'] == digit) &
             (df_downsampled['repetition'] == best_rep)
-        ].sort_values('t')
+        ].sort_values('t').copy()
         n_downsampled = len(df_downsampled)
 
 
@@ -213,9 +213,6 @@ def plot_xy_grid(df, df_downsampled, subject=1, line_color='black'):
 
     plt.show()
     print("Affichage terminé.")
-
-
-#plot_xy_grid(subject=10)
 
 # plot 3D of 1 subject and 1 digit before and after downsampling the repetition with the least points (most representative of the downsampling)
 
@@ -333,3 +330,138 @@ else:
     print("Aucun fichier trouvé.")
 
         
+
+
+def plot_xy_grid_corrige(df, df_downsampled, subject=1, line_color='black'):
+
+    Digits = sorted(df['digit'].unique())
+    N_rows = len(Digits)
+    N_columns = 2
+
+    fig, axes = plt.subplots(N_rows, N_columns, figsize=(18, 7))
+    
+    for row_idx, digit in enumerate(Digits):
+
+        # Sélection du groupe original
+        df_group = df[
+            (df['subject_id'] == subject) &
+            (df['digit'] == digit)
+        ]
+
+        rep_counts = df_group.groupby("repetition").size()
+        best_rep = rep_counts.idxmin()
+
+        # données originales pour la répétition choisie
+        df_orig = df_group[
+            df_group['repetition'] == best_rep
+        ].sort_values('t').copy()
+
+        n_orig = len(df_orig)
+
+        # données sous-échantillonnées pour le même groupe
+        # IMPORTANT : on utilise df_down pour ne pas écraser df_downsampled
+        df_down = df_downsampled[
+            (df_downsampled['subject_id'] == subject) &
+            (df_downsampled['digit'] == digit) &
+            (df_downsampled['repetition'] == best_rep)
+        ].sort_values('t').copy()
+
+        n_downsampled = len(df_down)
+
+        for col in ["x", "y"]:
+            df_orig[col] = df_orig[col].astype(float)
+            df_down[col] = df_down[col].astype(float)
+
+        # Limite d'axes
+        x_min = min(df_orig["x"].min(), df_down["x"].min())
+        x_max = max(df_orig["x"].max(), df_down["x"].max())
+        y_min = min(df_orig["y"].min(), df_down["y"].min())
+        y_max = max(df_orig["y"].max(), df_down["y"].max())
+        margin = 0.05
+
+        # --- Subplot gauche : original ---
+        ax_left = axes[row_idx, 0]
+        ax_left.plot(
+            df_orig["x"].values,
+            df_orig["y"].values,
+            color=line_color,
+            linewidth=0.9,
+            alpha=0.85
+        )
+        ax_left.scatter(
+            df_orig["x"].values,
+            df_orig["y"].values,
+            color=line_color,
+            s=6,
+            zorder=3
+        )
+        ax_left.set_title(
+            f"Digit {digit} — Original [n = {n_orig}]",
+            fontsize=9,
+            fontweight="bold",
+            loc="left"
+        )
+        ax_left.set_xlabel("x", fontsize=7)
+        ax_left.set_ylabel("y", fontsize=7)
+        ax_left.tick_params(labelsize=6)
+        ax_left.grid(True, linewidth=0.3, alpha=0.4)
+
+        ax_left.set_xlim(x_min - margin, x_max + margin)
+        ax_left.set_ylim(y_min - margin, y_max + margin)
+
+        # --- Subplot droite : sous-échantillonné ---
+        ax_right = axes[row_idx, 1]
+        ax_right.plot(
+            df_down["x"].values,
+            df_down["y"].values,
+            color=line_color,
+            linewidth=0.9,
+            alpha=0.85
+        )
+        ax_right.scatter(
+            df_down["x"].values,
+            df_down["y"].values,
+            color=line_color,
+            s=6,
+            zorder=3
+        )
+
+        ax_right.set_title(
+            f"Digit {digit} — Downsampled [n = {n_downsampled}]",
+            fontsize=9,
+            fontweight="bold",
+            loc="left"
+        )
+        ax_right.set_xlabel("x", fontsize=7)
+        ax_right.set_ylabel("y", fontsize=7)
+        ax_right.tick_params(labelsize=6)
+        ax_right.grid(True, linewidth=0.3, alpha=0.4)
+
+        ax_right.set_xlim(x_min - margin, x_max + margin)
+        ax_right.set_ylim(y_min - margin, y_max + margin)
+
+    axes[0, 0].set_title(
+        f"ORIGINAL  ·  Subject {subject}\n" + axes[0, 0].get_title(),
+        fontsize=9,
+        fontweight="bold",
+        loc="left"
+    )
+    axes[0, 1].set_title(
+        f"DOWNSAMPLED  ·  Subject {subject}\n" + axes[0, 1].get_title(),
+        fontsize=9,
+        fontweight="bold",
+        loc="left"
+    )
+
+    plt.suptitle(
+        f"Comparaison original vs sous-échantillonné — Subject {subject}",
+        fontsize=13,
+        fontweight="bold",
+        y=1.002
+    )
+
+    plt.subplots_adjust(hspace=0.85)
+    plt.subplots_adjust(wspace=0.15)
+
+    plt.show()
+    print("Affichage terminé.")
