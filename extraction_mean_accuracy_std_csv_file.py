@@ -3,7 +3,11 @@ import numpy as np
 import os 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR_DOMAIN4_D = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_user_indep_domain4_downsampled_PyTorch_5_trials.csv")
+DATA_DIR_DOMAIN4_D = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_user_indep_domain4_downsampled_PyTorch.csv")
+DATA_DIR_DOMAIN1_D = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_user_indep_domain1_downsampled_PyTorch.csv")
+
+DATA_DIR_DOMAIN1 = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_user_indep_domain1_PyTorch.csv")
+DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_user_indep_domain4_PyTorch.csv")
 
 try:
     # Lecture du fichier CSV
