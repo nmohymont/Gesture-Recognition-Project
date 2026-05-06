@@ -54,6 +54,7 @@ def downsample_data(group,factor=2):
     
     return result 
 
+'''
 print("Sous-echantillonnage des données...")
 
 df_downsampled = (
@@ -199,7 +200,7 @@ def txt_to_df(input_path):
 #df = txt_to_df(DATA_DIR_DOMAIN4_TEST)
 
 #print(df.head())
-
+'''
 DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Dataset", "Domain4_csv")
 
 # Liste pour stocker tous les DataFrames
@@ -222,8 +223,7 @@ if liste_dfs:
     print(f"Extraction terminée ! Taille totale : {df_final.shape}")
 else:
     print("Aucun fichier trouvé.")
-
-        
+ 
 
 
 def plot_xy_grid(df, df_downsampled, subject=1, line_color='black'):
