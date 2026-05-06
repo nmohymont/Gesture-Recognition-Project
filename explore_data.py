@@ -54,6 +54,7 @@ def downsample_data(group,factor=2):
     
     return result 
 
+'''
 print("Sous-echantillonnage des données...")
 
 df_downsampled = (
@@ -107,7 +108,7 @@ Digits = sorted(df['digit'].unique())
 N_rows = len(Digits)
 N_columns = 2
 
-
+'''
 
 def plot_xy_grid(df, df_downsampled, subject=1, line_color='black'):
 
@@ -305,7 +306,7 @@ def txt_to_df(input_path):
 #df = txt_to_df(DATA_DIR_DOMAIN4_TEST)
 
 #print(df.head())
-
+'''
 DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Dataset", "Domain4_csv")
 
 # Liste pour stocker tous les DataFrames
@@ -329,7 +330,7 @@ if liste_dfs:
 else:
     print("Aucun fichier trouvé.")
 
-        
+'''    
 
 
 def plot_xy_grid_corrige(df, df_downsampled, subject=1, line_color='black'):
