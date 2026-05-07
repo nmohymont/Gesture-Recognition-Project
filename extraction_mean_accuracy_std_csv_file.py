@@ -11,7 +11,7 @@ DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Resultats_statistiques", "resultats_u
 
 try:
     # Lecture du fichier CSV
-    df = pd.read_csv(DATA_DIR_DOMAIN4_D)
+    df = pd.read_csv(DATA_DIR_DOMAIN1)
     
     # Vérification que la colonne 'is_correct' existe bien
     if 'is_correct' in df.columns:
@@ -31,6 +31,13 @@ try:
             # On groupe les données par 'subject_id' et on calcule la moyenne de 'is_correct'
             accuracy_par_sujet = df.groupby('subject_id')['is_correct'].mean()
             
+
+            moyenne = accuracy_par_sujet.mean()
+            ecart_type = accuracy_par_sujet.std()
+
+            print(f"Moyenne inter-sujets : {moyenne:.4f}")
+            print(f"Écart-type inter-sujets : {ecart_type:.4f}")
+
             # On parcourt les résultats pour les afficher proprement
             for subject, acc in accuracy_par_sujet.items():
                 print(f"Sujet {subject} : {acc:.4f} ({acc*100:.2f}%)")

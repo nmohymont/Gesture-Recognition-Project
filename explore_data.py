@@ -54,7 +54,7 @@ def downsample_data(group,factor=2):
     
     return result 
 
-'''
+
 print("Sous-echantillonnage des données...")
 
 df_downsampled = (
@@ -200,7 +200,7 @@ def txt_to_df(input_path):
 #df = txt_to_df(DATA_DIR_DOMAIN4_TEST)
 
 #print(df.head())
-'''
+
 DATA_DIR_DOMAIN4 = os.path.join(BASE_DIR, "Dataset", "Domain4_csv")
 
 # Liste pour stocker tous les DataFrames
